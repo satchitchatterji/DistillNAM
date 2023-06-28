@@ -1,5 +1,6 @@
 nam/output/*
 .xqz-u-egg
+MNIST_CNN
 
 **/__pycache__
 **/.ipynb_checkpoints
