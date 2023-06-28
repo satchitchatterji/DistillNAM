@@ -6,10 +6,15 @@ import torch.nn.functional as F
 
 
 def weighted_loss(loss_func: Callable, logits: torch.Tensor, targets: torch.Tensor, weights: torch.tensor) -> torch.Tensor:
-    loss = loss_func(logits, targets, reduction='none')
-    #loss *= weights
-    #loss = torch.sum(loss, dim=0)
-    #loss = loss / torch.sum(weights, dim=0)
+    if "CrossEntropyLoss" in str(loss_func.__class__): 
+        # I could not think of a worse way of doing this
+        loss = loss_func(logits, targets)
+    else:
+        loss = loss_func(logits, targets, reduction='none')
+    print(loss.shape, weights.shape)
+    loss = weights*torch.tile(loss, (weights.shape[1],1)).T
+    loss = torch.sum(loss, dim=0)
+    loss = loss / torch.sum(weights, dim=0)
     return torch.mean(loss)
 
 
