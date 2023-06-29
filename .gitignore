@@ -1,6 +1,7 @@
 nam/output/*
 .xqz-u-egg
-MNIST_CNN
+# the dataset itself
+MNIST
 
 **/__pycache__
 **/.ipynb_checkpoints
