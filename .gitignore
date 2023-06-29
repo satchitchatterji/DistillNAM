@@ -1,6 +1,9 @@
 nam/output/*
 .xqz-u-egg
+# pytorch-lightning logs
 MNIST_CNN
+# the dataset itself
+MNIST
 
 **/__pycache__
 **/.ipynb_checkpoints
