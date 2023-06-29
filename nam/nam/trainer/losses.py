@@ -7,9 +7,9 @@ import torch.nn.functional as F
 
 def weighted_loss(loss_func: Callable, logits: torch.Tensor, targets: torch.Tensor, weights: torch.tensor) -> torch.Tensor:
     loss = loss_func(logits, targets, reduction='none')
-    loss *= weights
-    loss = torch.sum(loss, dim=0)
-    loss = loss / torch.sum(weights, dim=0)
+    #loss *= weights
+    #loss = torch.sum(loss, dim=0)
+    #loss = loss / torch.sum(weights, dim=0)
     return torch.mean(loss)
 
 
