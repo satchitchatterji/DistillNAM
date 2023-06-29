@@ -1,7 +1,5 @@
 nam/output/*
 .xqz-u-egg
-# pytorch-lightning logs
-MNIST_CNN
 # the dataset itself
 MNIST
 
