@@ -105,7 +105,7 @@ class Trainer:
         # Forward pass from the model.
         predictions, fnn_out = model(features)
 
-        loss = self.criterion(predictions, targets, weights, fnn_out, model)
+        loss = self.criterion(features, predictions, targets, weights, fnn_out, model)
         self.update_metric(metric, predictions, targets, weights)
 
         # Backward pass.
@@ -144,7 +144,7 @@ class Trainer:
         predictions, fnn_out = model(features)
 
         # Calculates loss on mini-batch.
-        loss = self.criterion(predictions, targets, weights, fnn_out, model)
+        loss = self.criterion(features, predictions, targets, weights, fnn_out, model)
         self.update_metric(metric, predictions, targets, weights)
 
         return loss

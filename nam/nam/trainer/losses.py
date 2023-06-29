@@ -51,13 +51,31 @@ def reg_penalty(fnn_out: torch.Tensor, model: nn.Module,
 
 
 def make_penalized_loss_func(loss_func, regression, output_regularization, l2_regularization):
-    def penalized_loss_func(logits, targets, weights, fnn_out, model):
+    def penalized_loss_func(features, logits, targets, weights, fnn_out, model):
         loss = weighted_loss(loss_func, logits, targets, weights)
         loss += reg_penalty(fnn_out, model, output_regularization, l2_regularization)
         return loss
 
     if not loss_func:
         loss_func = F.mse_loss if regression else F.binary_cross_entropy_with_logits
+    return penalized_loss_func
+
+
+def make_penalized_loss_func_distill(loss_func, regression, output_regularization, l2_regularization):
+    def penalized_loss_func(features, logits, targets, weights, fnn_out, model):
+        loss = weighted_loss(loss_func, logits, targets, weights)
+        loss += reg_penalty(fnn_out, model, output_regularization, l2_regularization)
+        
+        teacher_model = model.teacher_model
+        teacher_preprocess = model.teacher_preprocess
+        teacher_out = teacher_model(teacher_preprocess(features))
+        teacher_loss = F.cross_entropy(logits, teacher_out)
+        cosine_loss = 1-F.cosine_similarity(logits, teacher_out)
+        
+        loss = (loss + teacher_loss + cosine_loss)/3
+        return loss
+
+    loss_func = F.cross_entropy
     return penalized_loss_func
 
 

@@ -63,7 +63,9 @@ class MultiTaskNAM(torch.nn.Module):
         num_tasks: int,
         hidden_sizes: list,
         dropout: float,
-        feature_dropout: float
+        feature_dropout: float,
+        teacher_model: torch.nn.Module,
+        teacher_preprocess
     ) -> None:
         super(MultiTaskNAM, self).__init__()
 
@@ -77,6 +79,9 @@ class MultiTaskNAM(torch.nn.Module):
         self.feature_dropout = feature_dropout
 
         self.dropout_layer = nn.Dropout(p=self.feature_dropout)
+
+        self.teacher_model = teacher_model
+        self.teacher_preprocess = teacher_preprocess
 
         ## Builds the FeatureNNs on the first call.
         self.feature_nns = nn.ModuleList([
@@ -97,6 +102,9 @@ class MultiTaskNAM(torch.nn.Module):
     def calc_outputs(self, inputs: torch.Tensor) -> Sequence[torch.Tensor]:
         """Returns the output computed by each feature net."""
         return [self.feature_nns[i](inputs[:, i]) for i in range(self.num_inputs)]
+
+    def calc_teacher_outputs(self, inputs: torch.Tensor) -> Sequence[torch.Tensor]:
+        return self.teacher_model(self.teacher_preprocess(inputs))
 
     def forward(
         self,
