@@ -15,7 +15,7 @@ from nam.models import NAM, MultiTaskNAM
 from nam.models import get_num_units
 from nam.models.saver import Checkpointer
 from nam.trainer import Trainer
-from nam.trainer.losses import make_penalized_loss_func
+from nam.trainer.losses import make_penalized_loss_func_distill
 
 class NAMBase:
     def __init__(
