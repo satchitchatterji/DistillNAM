@@ -1,5 +1,10 @@
+import pytorch_lightning as L
+import torch
 from torch import Tensor as T
 from torch import nn
+from torch.nn import functional as F
+from torchmetrics.functional import accuracy
+
 
 # architecture reference:
 # https://medium.com/@jaredmcmullen1/developing-a-simple-cnn-for-mnist-f98c38f0d38d
@@ -23,3 +28,43 @@ class MNISTCnn(nn.Module):
         out = self.dropout(out)
         out = self.classifier(out.view(out.size(0), -1))
         return out
+
+
+# structure taken from
+# https://lightning.ai/docs/pytorch/stable/notebooks/lightning_examples/cifar10-baseline.html
+# FIXME only train and validation loss logged?!
+class LitMNIST(L.LightningModule):
+    def __init__(self):
+        super().__init__()
+        self.save_hyperparameters()
+        self.model = MNISTCnn()
+
+    def forward(self, x):
+        x = self.model(x)
+        return F.log_softmax(x, dim=1)
+
+    def training_step(self, batch, batch_idx):
+        x, y = batch
+        logits = self(x)
+        loss = F.nll_loss(logits, y)
+        self.log("train_loss", loss)
+        return loss
+
+    def evaluate(self, batch, stage=None):
+        x, y = batch
+        logits = self(x)
+        loss = F.nll_loss(logits, y)
+        preds = torch.argmax(logits, dim=1)
+        acc = accuracy(preds, y)
+        if stage:
+            self.log(f"{stage}_loss", loss, prog_bar=True)
+            self.log(f"{stage}_acc", acc, prog_bar=True)
+
+    def validation_step(self, batch, batch_idx):
+        self.evaluate(batch, stage="val")
+
+    def test_step(self, batch, batch_idx):
+        self.evaluate(batch, stage="test")
+
+    def configure_optimizers(self):
+        return torch.optim.Adam(self.parameters())
