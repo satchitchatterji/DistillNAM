@@ -17,7 +17,7 @@ def get_MNIST(
         f"Datasets root: {download_dir} batch size: {batch_size} n_workers: {num_workers}"
     )
     return MNISTDataModule(
-        download_dir,
+        data_dir=download_dir,
         normalize=normalize,
         num_workers=num_workers,
         batch_size=batch_size,
